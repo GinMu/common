@@ -5,3 +5,4 @@ export * from "./transaction";
 export * from "./types";
 export * from "./util";
 export * from "./wallet";
+export * from "./helper";

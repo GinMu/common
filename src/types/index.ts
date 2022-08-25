@@ -13,3 +13,14 @@ export interface IMemo {
     MemoData: string;
   };
 }
+
+export interface ITransfer {
+  node: string;
+  secret?: string;
+  from: string;
+  to: string;
+  value: string;
+  currency: string;
+  issuer: string;
+  memo: string;
+}
