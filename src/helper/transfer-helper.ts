@@ -8,6 +8,7 @@ const tp = require("tp-js-sdk");
 
 const sign = async (tx: any) => {
   const res = await tp.signJingtumTransaction(tx);
+  /* istanbul ignore next */
   if (!res.result) {
     throw new Error(res.msg);
   }
