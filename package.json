@@ -1,6 +1,6 @@
 {
   "name": "@jccdex/common",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "common util",
   "main": "lib/index.js",
   "scripts": {
