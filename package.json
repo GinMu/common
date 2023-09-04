@@ -30,7 +30,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@jccdex/jingtum-lib": "^0.1.5",
+    "@jccdex/jingtum-lib": "^0.2.0",
     "tp-js-sdk": "^3.7.5"
   },
   "files": [
