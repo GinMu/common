@@ -25,17 +25,25 @@ const sign = async (tx: any) => {
  */
 export const transfer = async (data: ITransfer): Promise<string> => {
   const { node, from, to, currency, value, issuer, memo, secret } = data;
+  const transaction = new Transaction({
+    wallet,
+    nodes: [node]
+  });
   const tx = serializePayment(from, value, to, currency, memo, wallet.getFee(), wallet.getCurrency(), issuer);
-  const sequence = await Transaction.fetchSequence(node, from);
+  const sequence = await transaction.fetchSequence(from);
   tx.Sequence = sequence;
   let blob;
   if (isDef(secret)) {
-    const res = wallet.sign(tx, data.secret);
+    const res = wallet.sign(tx as any, data.secret);
     blob = res.blob;
   } else if (typeof window !== "undefined" && tp.isConnected()) {
     blob = await sign(tx);
   }
 
-  const hash = await Transaction.sendRawTransaction({ blob, url: node });
-  return hash;
+  const res = await transaction.submitTransaction(blob);
+  if (!Transaction.isSuccess(res)) {
+    throw new Error(JSON.stringify(res));
+  }
+
+  return res.result.tx_json.hash;
 };

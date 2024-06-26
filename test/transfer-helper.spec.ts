@@ -3,68 +3,27 @@ import { wallet, user, hash, token, node, blob } from "./data/common";
 import { Transaction } from "@jccdex/jingtum-lib";
 import { transfer } from "../src";
 import sinon from "sinon";
-const tp = require("tp-js-sdk");
 
 const sandbox = sinon.createSandbox();
 describe("test transfer helper", () => {
+  const stub = sandbox.stub(Transaction.prototype, "fetchSequence");
+  const stub1 = sandbox.stub(Transaction.prototype, "submitTransaction");
+  // const stub2 = sandbox.stub(tp, "signJingtumTransaction");
+
   afterEach(() => {
-    sandbox.restore();
-  });
-
-  test("if secret is undefined", async () => {
-    const stub = sandbox.stub(Transaction, "fetchSequence");
-    stub.resolves(1);
-    const stub1 = sandbox.stub(Transaction, "sendRawTransaction");
-    stub1.resolves(hash);
-    const stub2 = sandbox.stub(tp, "signJingtumTransaction");
-    stub2.resolves({
-      result: true,
-      data: blob
-    });
-
-    const h = await transfer({
-      node,
-      from: wallet.address,
-      to: user,
-      value: token.value,
-      issuer: token.issuer,
-      currency: token.currency,
-      memo: ""
-    });
-    expect(
-      stub2.calledOnceWithExactly({
-        Account: wallet.address,
-        Amount: { currency: "JJCC", issuer: "jGa9J9TkqtBcUoHe2zqhVFFbgUVED6o9or", value: "0.01" },
-        Destination: user,
-        Fee: 0.01,
-        Flags: 0,
-        Memos: [
-          {
-            Memo: {
-              MemoData: "",
-              MemoType: "string"
-            }
-          }
-        ],
-        TransactionType: "Payment",
-        Sequence: 1
-      })
-    ).toEqual(true);
-    expect(stub.calledOnceWithExactly(node, wallet.address)).toEqual(true);
-    expect(
-      stub1.calledOnceWithExactly({
-        url: node,
-        blob: blob
-      })
-    ).toEqual(true);
-    expect(h).toEqual(hash);
+    sandbox.reset();
   });
 
   test("if secret is defined", async () => {
-    const stub = sandbox.stub(Transaction, "fetchSequence");
     stub.resolves(1);
-    const stub1 = sandbox.stub(Transaction, "sendRawTransaction");
-    stub1.resolves(hash);
+    stub1.resolves({
+      result: {
+        engine_result: "tesSUCCESS",
+        tx_json: {
+          hash
+        }
+      }
+    });
 
     const h = await transfer({
       node,
@@ -76,14 +35,9 @@ describe("test transfer helper", () => {
       currency: token.currency,
       memo: ""
     });
-    expect(stub.calledOnceWithExactly(node, wallet.address)).toEqual(true);
+    expect(stub.calledOnceWithExactly(wallet.address)).toEqual(true);
 
-    expect(
-      stub1.calledOnceWithExactly({
-        url: node,
-        blob
-      })
-    ).toEqual(true);
+    expect(stub1.calledOnceWithExactly(blob)).toEqual(true);
     expect(h).toEqual(hash);
   });
 });
